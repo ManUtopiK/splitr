@@ -31,9 +31,11 @@ export function loadConfigs(): SavedConfig[] {
   return read<SavedConfig[]>(CONFIGS_KEY) ?? []
 }
 
-export function saveConfig(name: string, layout: LayoutNode): SavedConfig[] {
+export function saveConfig(name: string, layout: LayoutNode, title?: string): SavedConfig[] {
   const configs = loadConfigs().filter((config) => config.name !== name)
-  configs.unshift({ name, layout, savedAt: Date.now() })
+  const entry: SavedConfig = { name, layout, savedAt: Date.now() }
+  if (title?.trim()) entry.title = title.trim()
+  configs.unshift(entry)
   write(CONFIGS_KEY, configs)
   return configs
 }

@@ -23,10 +23,14 @@
           # Result: $out/index.html — a self-contained page any web server can serve.
           splitr = pkgs.buildNpmPackage {
             pname = "splitr";
-            version = "0.1.0";
+            version = "0.2.0";
             src = self;
 
-            npmDepsHash = "sha256-GKnbvytJQ4LQbXZjY7JkqXhJ6WZTbnek0KRJAPpwYUI=";
+            npmDepsHash = "sha256-kBg5Kq1pzH/0IxKlbB9AMMyhMcyAdhHcxEcZxvGbzGY=";
+
+            # No .git in the Nix sandbox: pass the flake revision to the build
+            # so the <meta name="commit"> tag stays accurate.
+            env.GIT_COMMIT = self.shortRev or self.dirtyShortRev or "unknown";
 
             # vitest is not needed to build and vue-tsc runs in CI, keep the
             # build minimal and deterministic.

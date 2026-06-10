@@ -31,5 +31,7 @@ export type NodePath = ('a' | 'b')[]
 export interface SavedConfig {
   name: string
   layout: LayoutNode
+  /** Optional page title (?t= URL param). */
+  title?: string
   savedAt: number
 }

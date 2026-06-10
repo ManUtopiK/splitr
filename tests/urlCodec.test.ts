@@ -6,6 +6,7 @@ import {
   layoutFromParams,
   layoutToQuery,
   normalizeUrl,
+  titleFromParams,
 } from '../src/lib/urlCodec'
 import type { LayoutNode, SplitNode } from '../src/types'
 
@@ -91,6 +92,29 @@ describe('layoutToQuery', () => {
 
     const withRefresh = split('h', 50, frame('https://a.example/', 60), frame('https://b.example/'))
     expect(layoutToQuery(withRefresh)).toMatch(/^l=/)
+  })
+})
+
+describe('title param', () => {
+  it('appends ?t= to both simple and l-encoded queries', () => {
+    const pair = split('h', 50, frame('https://a.example/'), frame('https://b.example/'))
+    expect(new URLSearchParams(layoutToQuery(pair, 'My dash')).get('t')).toBe('My dash')
+
+    const nested = split('h', 50, frame('https://a.example/'), split('v', 50, frame('https://b.example/'), frame('https://c.example/')))
+    const params = new URLSearchParams(layoutToQuery(nested, 'My dash'))
+    expect(params.get('l')).toBeTruthy()
+    expect(params.get('t')).toBe('My dash')
+  })
+
+  it('omits empty or blank titles', () => {
+    const pair = split('h', 50, frame('https://a.example/'), frame('https://b.example/'))
+    expect(new URLSearchParams(layoutToQuery(pair, '  ')).get('t')).toBeNull()
+    expect(new URLSearchParams(layoutToQuery(pair)).get('t')).toBeNull()
+  })
+
+  it('titleFromParams reads and trims ?t=', () => {
+    expect(titleFromParams(new URLSearchParams('t=%20Dash%20'))).toBe('Dash')
+    expect(titleFromParams(new URLSearchParams(''))).toBe('')
   })
 })
 

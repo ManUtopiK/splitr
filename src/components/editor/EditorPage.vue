@@ -10,9 +10,9 @@ import LayoutPresets from './LayoutPresets.vue'
 import PaneEditor from './PaneEditor.vue'
 import SavedConfigs from './SavedConfigs.vue'
 
-const props = defineProps<{ initialLayout: LayoutNode | null }>()
+const props = defineProps<{ initialLayout: LayoutNode | null; initialTitle?: string }>()
 
-const tree = provideEditorTree(props.initialLayout)
+const tree = provideEditorTree(props.initialLayout, props.initialTitle ?? '')
 
 const showHelp = shallowRef(false)
 const copied = shallowRef(false)
@@ -25,7 +25,7 @@ const ready = computed(() => normalizedLayout.value !== null)
 const shareUrl = computed(() => {
   if (!normalizedLayout.value) return null
   const base = `${window.location.origin}${window.location.pathname}`
-  return `${base}?${layoutToQuery(normalizedLayout.value)}`
+  return `${base}?${layoutToQuery(normalizedLayout.value, tree.title.value)}`
 })
 
 async function copyUrl(): Promise<void> {
@@ -50,6 +50,13 @@ function open(): void {
       <LayoutPresets />
       <button :aria-expanded="showHelp" @click="showHelp = !showHelp">?&nbsp;Help</button>
       <div class="spacer" />
+      <input
+        v-model="tree.title.value"
+        class="title-input"
+        type="text"
+        placeholder="Page title (optional)"
+        autocomplete="off"
+      />
       <button :disabled="!ready" @click="copyUrl">
         {{ copied ? '✓ Copied' : 'Copy URL' }}
       </button>
@@ -102,6 +109,10 @@ h1 {
 
 .spacer {
   flex: 1;
+}
+
+.title-input {
+  width: clamp(8rem, 18vw, 14rem);
 }
 
 main {

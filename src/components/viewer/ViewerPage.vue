@@ -1,18 +1,33 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue'
-import { applyRatios, collectRatios, setRatioAt } from '../../lib/tree'
+import { shallowRef, watchEffect } from 'vue'
+import { applyRatios, collectRatios, listFrames, setRatioAt } from '../../lib/tree'
 import { clearSizes, loadSizes, saveSizes } from '../../lib/storage'
-import { encodeLayout, layoutToQuery } from '../../lib/urlCodec'
+import { layoutToQuery } from '../../lib/urlCodec'
 import type { LayoutNode, NodePath } from '../../types'
 import CornerMenu from './CornerMenu.vue'
 import FrameView from './FrameView.vue'
 import SplitPane from './SplitPane.vue'
 
-const props = defineProps<{ layout: LayoutNode }>()
+const props = defineProps<{ layout: LayoutNode; title?: string }>()
 
 // Sizes are remembered per shared URL: the canonical query is the storage key.
-const urlKey = layoutToQuery(props.layout)
+const urlKey = layoutToQuery(props.layout, props.title)
 const display = shallowRef<LayoutNode>(applyRatios(props.layout, loadSizes(urlKey) ?? {}))
+
+// Custom title when provided (?t=), otherwise the embedded hosts.
+watchEffect(() => {
+  document.title =
+    props.title?.trim() ||
+    listFrames(display.value)
+      .map(({ frame }) => {
+        try {
+          return new URL(frame.url).host
+        } catch {
+          return frame.url
+        }
+      })
+      .join(' | ')
+})
 
 function onResize(path: NodePath, ratio: number): void {
   display.value = setRatioAt(display.value, path, ratio)
@@ -20,12 +35,12 @@ function onResize(path: NodePath, ratio: number): void {
 }
 
 function edit(): void {
-  window.location.href = `${window.location.pathname}?edit=1&l=${encodeLayout(display.value)}`
+  window.location.href = `${window.location.pathname}?edit=1&${layoutToQuery(display.value, props.title)}`
 }
 
 async function copyUrl(): Promise<void> {
   const base = `${window.location.origin}${window.location.pathname}`
-  await navigator.clipboard.writeText(`${base}?${layoutToQuery(display.value)}`)
+  await navigator.clipboard.writeText(`${base}?${layoutToQuery(display.value, props.title)}`)
 }
 
 function toggleFullscreen(): void {

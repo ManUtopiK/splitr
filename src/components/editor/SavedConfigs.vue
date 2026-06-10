@@ -12,12 +12,13 @@ const name = shallowRef('')
 function save(): void {
   const trimmed = name.value.trim()
   if (!trimmed) return
-  configs.value = saveConfig(trimmed, tree.layout.value)
+  configs.value = saveConfig(trimmed, tree.layout.value, tree.title.value)
   name.value = ''
 }
 
 function load(config: SavedConfig): void {
   tree.setLayout(config.layout)
+  tree.title.value = config.title ?? ''
 }
 
 function remove(config: SavedConfig): void {

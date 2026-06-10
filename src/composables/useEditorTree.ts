@@ -17,6 +17,8 @@ import type { FrameNode, LayoutNode, NodePath } from '../types'
  */
 export interface EditorTree {
   layout: ShallowRef<LayoutNode>
+  /** Optional page title shared via the ?t= URL param. */
+  title: ShallowRef<string>
   splitPane: (path: NodePath, dir: 'h' | 'v') => void
   removePane: (path: NodePath) => void
   updateFrame: (path: NodePath, patch: Partial<Omit<FrameNode, 'type'>>) => void
@@ -30,8 +32,9 @@ export interface EditorTree {
 
 const KEY: InjectionKey<EditorTree> = Symbol('editor-tree')
 
-export function provideEditorTree(initial: LayoutNode | null): EditorTree {
+export function provideEditorTree(initial: LayoutNode | null, initialTitle = ''): EditorTree {
   const layout = shallowRef<LayoutNode>(initial ?? defaultLayout())
+  const title = shallowRef(initialTitle)
 
   const getShare = (path: NodePath): number | null => {
     if (path.length === 0) return null
@@ -43,6 +46,7 @@ export function provideEditorTree(initial: LayoutNode | null): EditorTree {
 
   const tree: EditorTree = {
     layout,
+    title,
     splitPane: (path, dir) => {
       layout.value = splitAt(layout.value, path, dir)
     },

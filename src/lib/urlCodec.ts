@@ -100,17 +100,24 @@ function asSimplePair(layout: LayoutNode): { a: FrameNode; b: FrameNode; split: 
 }
 
 /** Build the query string (without leading '?') for a layout. */
-export function layoutToQuery(layout: LayoutNode): string {
+export function layoutToQuery(layout: LayoutNode, title?: string): string {
   const pair = asSimplePair(layout)
+  const params = new URLSearchParams()
   if (pair) {
-    const params = new URLSearchParams()
     params.set('a', pair.a.url)
     params.set('b', pair.b.url)
     if (pair.split.dir !== 'h') params.set('dir', pair.split.dir)
     if (pair.split.ratio !== 50) params.set('ratio', String(pair.split.ratio))
-    return params.toString()
+  } else {
+    params.set('l', encodeLayout(layout))
   }
-  return `l=${encodeLayout(layout)}`
+  if (title?.trim()) params.set('t', title.trim())
+  return params.toString()
+}
+
+/** Optional page title carried alongside the layout (?t=). */
+export function titleFromParams(params: URLSearchParams): string {
+  return params.get('t')?.trim() ?? ''
 }
 
 /** Parse a layout from URL search params. Returns null when absent/invalid. */
