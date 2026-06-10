@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, useTemplateRef } from 'vue'
+import { useDividerDrag } from '../../composables/useDividerDrag'
 import { useEditorTree } from '../../composables/useEditorTree'
 import type { LayoutNode, NodePath } from '../../types'
 
@@ -9,6 +10,16 @@ const props = defineProps<{
 }>()
 
 const tree = useEditorTree()
+
+// Drag handle between the two children: updates the split ratio live,
+// which the size % fields reflect (they derive from the tree).
+const container = useTemplateRef('container')
+
+const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
+  container,
+  dir: () => (props.node.type === 'split' ? props.node.dir : 'h'),
+  onRatio: (ratio) => tree.setRatio(props.path, ratio),
+})
 
 const share = computed(() => tree.getShare(props.path))
 
@@ -30,13 +41,26 @@ function onShareInput(event: Event): void {
 
 <template>
   <!-- Split: recurse into both children, laid out like the final result -->
-  <div v-if="node.type === 'split'" class="split" :class="node.dir === 'h' ? 'row' : 'column'">
+  <div
+    v-if="node.type === 'split'"
+    ref="container"
+    class="split"
+    :class="node.dir === 'h' ? 'row' : 'column'"
+  >
     <PaneEditor
       :node="node.a"
       :path="[...path, 'a']"
       :style="{ flexBasis: `${node.ratio}%` }"
     />
-    <div class="gutter" />
+    <div
+      class="gutter"
+      role="separator"
+      :aria-orientation="node.dir === 'h' ? 'vertical' : 'horizontal'"
+      @pointerdown="onPointerDown"
+      @pointermove="onPointerMove"
+      @pointerup="onPointerUp"
+      @pointercancel="onPointerUp"
+    />
     <PaneEditor
       :node="node.b"
       :path="[...path, 'b']"
@@ -118,6 +142,21 @@ function onShareInput(event: Event): void {
   background: var(--border);
   border-radius: 3px;
   margin: 2px;
+  touch-action: none;
+  transition: background 0.15s;
+}
+
+.row > .gutter {
+  cursor: col-resize;
+}
+
+.column > .gutter {
+  cursor: row-resize;
+}
+
+.gutter:hover,
+body.splitr-dragging .gutter {
+  background: var(--accent);
 }
 
 .pane {

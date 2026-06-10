@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { useTemplateRef } from 'vue'
-import { clampRatio } from '../../lib/urlCodec'
+import { useDividerDrag } from '../../composables/useDividerDrag'
 import type { NodePath, SplitNode } from '../../types'
 import FrameView from './FrameView.vue'
 
 // Resizable binary split, inspired by nuxt/devtools NSplitPane: percentage
-// flex-basis + pointer capture on the divider. Resize events bubble to
+// flex-basis + pointer drag on the divider. Resize events bubble to
 // ViewerPage through the forwarded onResize callback (recursive tree).
 const props = defineProps<{
   node: SplitNode
@@ -15,39 +15,11 @@ const props = defineProps<{
 
 const container = useTemplateRef('container')
 
-let dragging = false
-
-function onPointerDown(event: PointerEvent): void {
-  dragging = true
-  try {
-    ;(event.target as HTMLElement).setPointerCapture(event.pointerId)
-  } catch {
-    // Capture is best-effort; the dragging flag drives the resize.
-  }
-  // Iframes swallow pointer events: disable them globally while dragging.
-  document.body.classList.add('splitr-dragging')
-}
-
-function onPointerMove(event: PointerEvent): void {
-  if (!dragging) return
-  const rect = container.value?.getBoundingClientRect()
-  if (!rect) return
-  const ratio =
-    props.node.dir === 'h'
-      ? ((event.clientX - rect.left) / rect.width) * 100
-      : ((event.clientY - rect.top) / rect.height) * 100
-  props.onResize(props.path, clampRatio(ratio))
-}
-
-function onPointerUp(event: PointerEvent): void {
-  dragging = false
-  try {
-    ;(event.target as HTMLElement).releasePointerCapture(event.pointerId)
-  } catch {
-    // ignore
-  }
-  document.body.classList.remove('splitr-dragging')
-}
+const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
+  container,
+  dir: () => props.node.dir,
+  onRatio: (ratio) => props.onResize(props.path, ratio),
+})
 </script>
 
 <template>

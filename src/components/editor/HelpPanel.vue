@@ -5,7 +5,8 @@
       layout in the URL, so any combination is shareable as a single link.
     </p>
     <ul>
-      <li>Fill a URL in each panel, then <em>Open</em> or <em>Copy URL</em>.</li>
+      <li>Fill a URL in each panel, then <em>Open</em> or <em>Copy URL</em>. The header icons apply common layouts (columns, rows, main + side panels, grid) while keeping the URLs already typed.</li>
+      <li>Drag the bar between panels to adjust sizes — the <em>size</em> fields follow.</li>
       <li><em>split horizontal</em> divides a panel into two columns, <em>split vertical</em> into two rows. Layouts can be nested freely.</li>
       <li><em>size</em> sets the panel share of its parent split (%); <em>refresh</em> reloads the frame every N seconds.</li>
       <li>Two panels side by side give a readable URL (<code>?a=…&amp;b=…</code>); complex layouts use a compact <code>?l=…</code> parameter.</li>

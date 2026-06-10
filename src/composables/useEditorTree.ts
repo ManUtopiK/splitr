@@ -23,6 +23,8 @@ export interface EditorTree {
   /** Percentage of the parent split granted to the node at `path`. */
   getShare: (path: NodePath) => number | null
   setShare: (path: NodePath, pct: number) => void
+  /** Set the ratio of the split node at `path` directly (drag handles). */
+  setRatio: (path: NodePath, ratio: number) => void
   setLayout: (layout: LayoutNode) => void
 }
 
@@ -56,6 +58,9 @@ export function provideEditorTree(initial: LayoutNode | null): EditorTree {
       const branch = path[path.length - 1]
       const ratio = branch === 'a' ? pct : 100 - pct
       layout.value = setRatioAt(layout.value, path.slice(0, -1), ratio)
+    },
+    setRatio: (path, ratio) => {
+      layout.value = setRatioAt(layout.value, path, ratio)
     },
     setLayout: (next) => {
       layout.value = next

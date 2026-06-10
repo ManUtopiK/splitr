@@ -6,6 +6,7 @@ import { layoutToQuery } from '../../lib/urlCodec'
 import type { LayoutNode } from '../../types'
 import SplitLogo from '../SplitLogo.vue'
 import HelpPanel from './HelpPanel.vue'
+import LayoutPresets from './LayoutPresets.vue'
 import PaneEditor from './PaneEditor.vue'
 import SavedConfigs from './SavedConfigs.vue'
 
@@ -46,6 +47,7 @@ function open(): void {
         <SplitLogo class="logo" />
         <h1>splitr</h1>
       </div>
+      <LayoutPresets />
       <button :aria-expanded="showHelp" @click="showHelp = !showHelp">?&nbsp;Help</button>
       <div class="spacer" />
       <button :disabled="!ready" @click="copyUrl">
