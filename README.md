@@ -1,5 +1,7 @@
 # splitr
 
+![splitr editor](.github/screenshot.png)
+
 Split-screen iframe viewer. Display several web pages in one screen, with the whole layout encoded in the URL — any combination is shareable as a single link.
 
 Builds to a **single self-contained `index.html`** (JS + CSS inlined): serve it with Caddy, nginx, GitHub Pages or open it from disk.
