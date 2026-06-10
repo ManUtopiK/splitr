@@ -28,6 +28,15 @@ const presets: Preset[] = [
     build: (frame) => makeSplit('h', frame(), frame()),
   },
   {
+    id: 'quarter-left',
+    title: 'Quarter left + three quarters right',
+    rects: [
+      { x: 0, y: 0, w: 4.5, h: 14 },
+      { x: 5.5, y: 0, w: 14.5, h: 14 },
+    ],
+    build: (frame) => makeSplit('h', frame(), frame(), 25),
+  },
+  {
     id: 'rows',
     title: 'Two rows',
     rects: [
@@ -70,10 +79,14 @@ const presets: Preset[] = [
   },
 ]
 
-/** Structure signature ignoring URLs and ratios, to highlight the active preset. */
+/**
+ * Structure signature ignoring URLs, to highlight the active preset. Ratios
+ * are included so same-structure presets (two columns vs quarter+three
+ * quarters) are distinguished; a hand-resized layout simply unhighlights.
+ */
 function shape(node: LayoutNode): string {
   if (node.type === 'frame') return 'f'
-  return `${node.dir}(${shape(node.a)},${shape(node.b)})`
+  return `${node.dir}${node.ratio}(${shape(node.a)},${shape(node.b)})`
 }
 
 const activeShape = computed(() => shape(tree.layout.value))
