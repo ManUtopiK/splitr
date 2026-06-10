@@ -18,6 +18,7 @@ https://splitr.example.com/?a=https://first.example&b=https://second.example
 | `dir`   | `h` side by side (default) or `v` stacked                          |
 | `ratio` | Percentage of the space given to the first panel (default `50`)    |
 | `l`     | Full layout tree (base64url JSON) — nested splits, refresh options |
+| `t`     | Optional page title (defaults to the embedded hosts)               |
 | `edit`  | Open the configuration editor pre-filled with the layout           |
 
 Without parameters, the **editor** opens: fill a URL per panel, split panels horizontally/vertically (layouts nest freely, inspired by [frame-splits](https://github.com/dsingleton/frame-splits)), set per-panel size (%) and optional auto-refresh (seconds), then *Copy URL* or *Open*. Named configurations can be saved locally (localStorage).
