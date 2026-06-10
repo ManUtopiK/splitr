@@ -5,10 +5,12 @@ import type { LayoutNode, SavedConfig } from '../types'
  * - splitr:configs        — named configurations (editor)
  * - splitr:sizes:<query>  — per-URL ratio overrides set by end-user resizing,
  *   keyed by the full share query so each shared URL remembers its own sizes.
+ * - splitr:syncTabs       — viewer option: mirror layout across tabs (BroadcastChannel)
  */
 
 const CONFIGS_KEY = 'splitr:configs'
 const SIZES_PREFIX = 'splitr:sizes:'
+const SYNC_KEY = 'splitr:syncTabs'
 
 function read<T>(key: string): T | null {
   try {
@@ -60,4 +62,12 @@ export function clearSizes(urlKey: string): void {
   } catch {
     // ignore
   }
+}
+
+export function loadSyncPref(): boolean {
+  return read<boolean>(SYNC_KEY) ?? false
+}
+
+export function saveSyncPref(enabled: boolean): void {
+  write(SYNC_KEY, enabled)
 }

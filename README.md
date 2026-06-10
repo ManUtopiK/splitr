@@ -18,6 +18,7 @@
 - **Visual editor** — fill a URL per panel, pick a layout preset, adjust per-panel size (%), then *Copy URL* or *Open*
 - **Per-panel auto-refresh** — reload any panel on its own interval (seconds)
 - **Resizable viewer** — drag the dividers; sizes are remembered per URL in localStorage
+- **Tab sync** — optional: mirror resizes live across all your tabs showing the same layout (BroadcastChannel, opt-in from the viewer menu)
 - **Saved configurations** — name and store layouts locally (localStorage)
 - **Viewer menu** — discreet corner button: edit layout, copy URL, fullscreen, reset sizes
 - **Custom page title** — `?t=` sets the tab title (defaults to the embedded hosts)

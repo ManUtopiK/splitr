@@ -2,11 +2,14 @@
 import { shallowRef } from 'vue'
 import SplitLogo from '../SplitLogo.vue'
 
+defineProps<{ syncTabs: boolean }>()
+
 const emit = defineEmits<{
   edit: []
   copy: []
   fullscreen: []
   reset: []
+  toggleSync: [enabled: boolean]
 }>()
 
 const open = shallowRef(false)
@@ -47,6 +50,14 @@ function onReset(): void {
       <button @click="copy">{{ copied ? '✓ Copied' : 'Copy URL' }}</button>
       <button @click="onFullscreen">Fullscreen</button>
       <button @click="onReset">Reset sizes</button>
+      <label class="sync">
+        <input
+          type="checkbox"
+          :checked="syncTabs"
+          @change="emit('toggleSync', ($event.target as HTMLInputElement).checked)"
+        />
+        Synchroniser le layout entre mes onglets
+      </label>
     </nav>
   </div>
 </template>
@@ -98,5 +109,25 @@ nav button {
 
 nav button:hover {
   background: var(--accent-soft);
+}
+
+.sync {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.55rem 0.9rem;
+  border-top: 1px solid var(--border);
+  font-size: 0.85em;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.sync:hover {
+  background: var(--accent-soft);
+}
+
+.sync input {
+  margin: 0;
+  accent-color: var(--accent);
 }
 </style>
