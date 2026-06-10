@@ -1,0 +1,100 @@
+:root {
+  --bg: #0f1115;
+  --bg-raised: #181b21;
+  --border: #2a2f37;
+  --text: #e6e8eb;
+  --text-dim: #9aa3ad;
+  --accent: #5b9dff;
+  --accent-soft: rgba(91, 157, 255, 0.14);
+  --danger: #ff7b72;
+  --radius: 0.5rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body,
+#app {
+  height: 100%;
+}
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, sans-serif;
+  font-size: 15px;
+}
+
+button {
+  font: inherit;
+  color: inherit;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.45rem 0.9rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+button:hover {
+  border-color: var(--accent);
+}
+
+button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--bg);
+  font-weight: 600;
+}
+
+button.primary:hover {
+  background: #7cb0ff;
+}
+
+button.danger {
+  color: var(--danger);
+}
+
+button.danger:hover {
+  border-color: var(--danger);
+}
+
+button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  border-color: var(--border);
+}
+
+input {
+  font: inherit;
+  color: inherit;
+  background: var(--bg-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 0.45rem 0.75rem;
+}
+
+input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+input[type='number'] {
+  width: 5.5rem;
+}
+
+/* While a divider is dragged, iframes must not swallow pointer events. */
+body.splitr-dragging {
+  user-select: none;
+}
+
+body.splitr-dragging iframe {
+  pointer-events: none;
+}
