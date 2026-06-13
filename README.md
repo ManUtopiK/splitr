@@ -51,10 +51,10 @@ In the **viewer**, drag the dividers to resize — sizes are remembered per URL 
 
 Turn any layout into a **live session** where one presenter drives the view for everyone — useful for walkthroughs, dashboards on a wall of screens, or remote demos.
 
-From the viewer menu, choose **Start session**. You become the *presenter* and get two links:
+Start one from the editor's **Present** menu (or the viewer's **Start session**). You become the *presenter* and your URL is just `…?room=<id>` — **no secret in the address bar**, so it's safe to screen-share. Your presenter key is kept in this browser's `localStorage`, never in the URL. Two links from the session menu:
 
-- your own URL keeps a secret in the fragment: `…?room=<id>#key=<secret>` — keep it;
-- the **spectator link** (copied from the session menu) is the same URL *without* the fragment: `…?room=<id>` — share it.
+- **Spectator link** — `…?room=<id>` — share it; recipients watch, read-only.
+- **Co-presenter link** — `…?room=<id>#key=<secret>` — share it only with someone you want to *co-drive* the session. Opening it grants presenter control, then the key is stored locally and stripped from their address bar.
 
 The presenter controls, propagated live to every spectator:
 
@@ -62,7 +62,7 @@ The presenter controls, propagated live to every spectator:
 - **panel URLs** — hover a panel to reveal an inline URL bar and retarget a single iframe. Spectators are **not** reloaded: a *“Le présentateur affiche …”* banner appears over that panel only, and each spectator clicks **Basculer** to switch (or **Ignorer**). Other panels are untouched;
 - **shared pointer** — toggle **Mode pointeur** to broadcast the presenter's cursor over all panels (an overlay captures the pointer above iframes, so clicking through is paused while it's on).
 
-How it works: state is shared peer-to-peer through a [Yjs](https://yjs.dev) document over [y-webrtc](https://github.com/yjs/y-webrtc) — no server stores anything, no account. The presenter role is whoever holds the `#key=` fragment, which never leaves the browser.
+How it works: state is shared peer-to-peer through a [Yjs](https://yjs.dev) document over [y-webrtc](https://github.com/yjs/y-webrtc) — no server stores anything, no account. The presenter role is whoever holds the key in `localStorage` for that room (the session creator, or anyone who opened a co-presenter link). The role is tied to the browser, so switching device or clearing storage drops it.
 
 > **Known limitations.** The role is cooperative, not cryptographically enforced (fine for trusted groups). Sessions use a public best-effort signaling server (`wss://signaling.yjs.dev`) and a public STUN server; override them with `?signal=` / `?stun=`. There is no TURN relay, so peers behind a symmetric NAT or strict corporate firewall may fail to connect. The shared pointer is positioned as a fraction of each panel, so it stays in the right panel for everyone, but it cannot land on the exact same pixel of an embedded page across differently-sized windows — the iframe content is cross-origin and doesn't scale with the panel. For pixel-accurate pointing, viewers should use similar window sizes. When the presenter navigates *inside* a cross-origin panel (clicking a link in the embedded site), that navigation can't be detected or replayed — the browser hides a third-party iframe's URL. Use the per-panel URL bar to push a new address explicitly instead.
 
