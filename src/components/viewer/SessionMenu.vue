@@ -50,10 +50,23 @@ function copyUrls(): void {
 
 <template>
   <div class="corner" :class="{ open }">
-    <button class="trigger" :title="isPresenter ? 'Session (présentateur)' : 'Session'" @click="open = !open">
-      <SplitLogo :size="16" />
-      <span class="dot" :class="{ live: connected }" />
-    </button>
+    <div class="bar">
+      <button class="trigger" :title="isPresenter ? 'Session (présentateur)' : 'Session'" @click="open = !open">
+        <SplitLogo :size="16" />
+        <span class="dot" :class="{ live: connected }" />
+      </button>
+      <button
+        v-if="isPresenter"
+        class="ptr"
+        :class="{ active: pointerMode }"
+        :title="pointerMode ? 'Mode pointeur actif' : 'Mode pointeur'"
+        @click="emit('togglePointer')"
+      >
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 2 L5 19 L9.2 15 L12.4 22 L15 20.9 L11.8 14 L18 14 Z" fill="currentColor" />
+        </svg>
+      </button>
+    </div>
     <nav v-if="open">
       <p class="status">
         <strong>{{ isPresenter ? 'Présentateur' : 'Spectateur' }}</strong>
@@ -63,9 +76,6 @@ function copyUrls(): void {
       <button v-if="isPresenter" @click="copy">{{ copied ? '✓ Lien copié' : 'Copier le lien spectateur' }}</button>
       <button v-if="isPresenter" @click="copyCoPresenter">
         {{ copiedCo ? '✓ Lien copié' : 'Copier le lien co-présentateur' }}
-      </button>
-      <button v-if="isPresenter" @click="emit('togglePointer')">
-        {{ pointerMode ? '✓ Mode pointeur' : 'Mode pointeur' }}
       </button>
       <button @click="copyUrls">{{ copiedUrls ? '✓ URLs copiées' : 'Copier les URLs des iframes' }}</button>
       <button @click="emit('fullscreen')">Plein écran</button>
@@ -86,8 +96,16 @@ function copyUrls(): void {
   gap: 0.3rem;
 }
 
-.trigger {
+.bar {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.trigger,
+.ptr {
   position: relative;
+  display: flex;
+  align-items: center;
   padding: 0.3rem 0.4rem;
   color: var(--accent);
   background: rgba(15, 17, 21, 0.55);
@@ -97,10 +115,18 @@ function copyUrls(): void {
 }
 
 .trigger:hover,
+.ptr:hover,
 .open .trigger {
   opacity: 1;
   border-color: var(--border);
   background: rgba(15, 17, 21, 1);
+}
+
+.ptr.active {
+  opacity: 1;
+  color: #fff;
+  background: var(--accent);
+  border-color: var(--accent);
 }
 
 .dot {
