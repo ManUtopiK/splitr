@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { computed, inject, onUnmounted, shallowRef, watchEffect } from 'vue'
+import { computed, inject, onUnmounted, ref, shallowRef, watchEffect } from 'vue'
 import type { FrameNode, NodePath } from '../../types'
 import { panelContextKey } from '../../composables/panelContext'
-import PanelUrlBar from './PanelUrlBar.vue'
+import PanelControls from './PanelControls.vue'
 
 const props = withDefaults(defineProps<{ frame: FrameNode; path?: NodePath }>(), {
   path: () => [],
@@ -35,21 +35,45 @@ function hostOf(url: string): string {
     return url
   }
 }
+
+// Empty panel: the presenter types the URL right here, no popover needed.
+const emptyDraft = ref('')
+function submitEmptyUrl(): void {
+  const value = emptyDraft.value.trim()
+  if (value) panel?.setUrl(pathKey.value, value)
+}
 </script>
 
 <template>
   <div class="frame">
     <iframe
+      v-if="frame.url"
       :key="reloadTick"
       :src="frame.url"
       :title="frame.url"
       allow="fullscreen"
       referrerpolicy="no-referrer"
     />
-    <PanelUrlBar
+    <div v-else class="empty">
+      <form v-if="panel?.isPresenter" class="empty-form" @submit.prevent="submitEmptyUrl">
+        <input
+          v-model="emptyDraft"
+          type="text"
+          spellcheck="false"
+          autocomplete="off"
+          placeholder="https://…"
+          aria-label="URL du panneau"
+        />
+        <button type="submit">Afficher</button>
+      </form>
+      <span v-else>Panneau vide</span>
+    </div>
+    <PanelControls
       v-if="panel?.isPresenter"
       :url="frame.url"
-      @submit="panel.setUrl(pathKey, $event)"
+      @set-url="panel.setUrl(pathKey, $event)"
+      @add="panel.addPanel(pathKey, $event)"
+      @remove="panel.removePanel(pathKey)"
     />
     <div v-else-if="pendingUrl" class="pending">
       <span class="label">Le présentateur affiche <strong>{{ hostOf(pendingUrl) }}</strong></span>
@@ -68,9 +92,8 @@ function hostOf(url: string): string {
   height: 100%;
 }
 
-.frame:hover :deep(.url-bar) {
+.frame:hover :deep(.panel-controls .trigger) {
   opacity: 1;
-  pointer-events: auto;
 }
 
 iframe {
@@ -79,6 +102,39 @@ iframe {
   height: 100%;
   display: block;
   background: #fff;
+}
+
+.empty {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  text-align: center;
+  color: var(--text-dim, #9aa3ad);
+  background: var(--bg, #0f1115);
+  font-size: 0.85rem;
+}
+
+.empty-form {
+  display: flex;
+  gap: 0.35rem;
+  width: min(90%, 360px);
+}
+
+.empty-form input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.9rem;
+}
+
+.empty-form button {
+  padding: 0.4rem 0.7rem;
+  font-size: 0.9rem;
+  color: var(--accent, #58a6ff);
+  border-color: var(--accent, #58a6ff);
 }
 
 .pending {

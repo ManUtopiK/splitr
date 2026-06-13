@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, provide, ref, shallowRef, watch, watchEffect } from 'vue'
-import { listFrames, setRatioAt, updateFrameAt } from '../../lib/tree'
+import { addPanelAt, listFrames, removeAt, setRatioAt, updateFrameAt } from '../../lib/tree'
 import { normalizeUrl } from '../../lib/urlCodec'
-import { reconcileLayout } from '../../lib/reconcile'
+import { pruneEmptyFrames, reconcileLayout } from '../../lib/reconcile'
 import { spectatorLink, type SessionInfo } from '../../lib/session'
 import { useRoom } from '../../composables/useRoom'
 import { useSharedCursor } from '../../composables/useSharedCursor'
@@ -57,7 +57,8 @@ watch(
       displayed.value = desired
       return
     }
-    const { tree, pending: list } = reconcileLayout(displayed.value, desired)
+    // Hide panels the presenter just added but hasn't given a URL yet.
+    const { tree, pending: list } = reconcileLayout(displayed.value, pruneEmptyFrames(desired))
     displayed.value = tree
     const next: Record<string, string> = {}
     for (const item of list) {
@@ -75,6 +76,14 @@ provide(panelContextKey, {
     const normalized = normalizeUrl(url)
     if (!normalized) return
     room.setLayout(updateFrameAt(room.layout.value, pathFromKey(key), { url: normalized }))
+  },
+  addPanel: (key, position) => {
+    if (!room.isPresenter) return
+    room.setLayout(addPanelAt(room.layout.value, pathFromKey(key), position))
+  },
+  removePanel: (key) => {
+    if (!room.isPresenter || key === '') return
+    room.setLayout(removeAt(room.layout.value, pathFromKey(key)))
   },
   pendingAt: (key) => pending.value[key],
   accept: (key) => {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { reconcileLayout } from '../src/lib/reconcile'
+import { pruneEmptyFrames, reconcileLayout } from '../src/lib/reconcile'
 import type { LayoutNode, SplitNode } from '../src/types'
 
 const frame = (url: string): LayoutNode => ({ type: 'frame', url })
@@ -9,6 +9,32 @@ const split = (a: LayoutNode, b: LayoutNode, ratio = 50): SplitNode => ({
   ratio,
   a,
   b,
+})
+
+describe('pruneEmptyFrames', () => {
+  it('collapses a split whose new panel has no URL yet', () => {
+    const layout = split(frame('https://a'), frame(''))
+    expect(pruneEmptyFrames(layout)).toEqual(frame('https://a'))
+  })
+
+  it('keeps the split once both panels have a URL', () => {
+    const layout = split(frame('https://a'), frame('https://b'))
+    expect(pruneEmptyFrames(layout)).toEqual(layout)
+  })
+
+  it('collapses on either side', () => {
+    expect(pruneEmptyFrames(split(frame(''), frame('https://b')))).toEqual(frame('https://b'))
+  })
+
+  it('prunes nested empty panels', () => {
+    const layout = split(frame('https://a'), split(frame('https://b'), frame('')))
+    expect(pruneEmptyFrames(layout)).toEqual(split(frame('https://a'), frame('https://b')))
+  })
+
+  it('leaves a complete layout untouched', () => {
+    const layout = split(frame('https://a'), split(frame('https://b'), frame('https://c')))
+    expect(pruneEmptyFrames(layout)).toEqual(layout)
+  })
 })
 
 describe('reconcileLayout', () => {

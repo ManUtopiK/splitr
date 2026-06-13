@@ -50,3 +50,21 @@ export function reconcileLayout(
   // Structural change (frame <-> split): adopt the new layout wholesale.
   return { tree: desired, pending: [] }
 }
+
+/**
+ * Collapse splits whose child is a still-empty frame (no URL yet). The presenter
+ * adds a panel empty and fills its URL afterwards; spectators shouldn't see the
+ * blank panel appear (and the sibling iframe shouldn't reparent/reload) until
+ * it actually has content. Applied to the shared layout before reconciling.
+ */
+export function pruneEmptyFrames(node: LayoutNode): LayoutNode {
+  if (node.type === 'frame') return node
+  const a = pruneEmptyFrames(node.a)
+  const b = pruneEmptyFrames(node.b)
+  const aEmpty = a.type === 'frame' && !a.url
+  const bEmpty = b.type === 'frame' && !b.url
+  if (aEmpty && !bEmpty) return b
+  if (bEmpty && !aEmpty) return a
+  if (aEmpty && bEmpty) return a
+  return { ...node, a, b }
+}

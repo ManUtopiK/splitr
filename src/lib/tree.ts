@@ -38,6 +38,22 @@ export function splitAt(root: LayoutNode, path: NodePath, dir: 'h' | 'v'): Layou
   return replaceAt(root, path, makeSplit(dir, target, makeFrame(url)))
 }
 
+/** Where a new panel is added relative to the target. */
+export type AddPosition = 'left' | 'right' | 'top' | 'bottom'
+
+/**
+ * Add an empty panel next to the node at `path`. Unlike `splitAt`, the new
+ * frame can go on either side, so all four directions are expressible.
+ */
+export function addPanelAt(root: LayoutNode, path: NodePath, position: AddPosition): LayoutNode {
+  const target = nodeAt(root, path)
+  if (!target) return root
+  const dir: 'h' | 'v' = position === 'left' || position === 'right' ? 'h' : 'v'
+  const fresh = makeFrame()
+  const [a, b] = position === 'left' || position === 'top' ? [fresh, target] : [target, fresh]
+  return replaceAt(root, path, makeSplit(dir, a, b))
+}
+
 /** Remove the node at `path`; its sibling takes the parent's place. */
 export function removeAt(root: LayoutNode, path: NodePath): LayoutNode {
   if (path.length === 0) return root

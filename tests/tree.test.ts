@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+  addPanelAt,
   applyRatios,
   collectRatios,
   isComplete,
@@ -12,10 +13,49 @@ import {
   splitAt,
   updateFrameAt,
 } from '../src/lib/tree'
-import type { SplitNode } from '../src/types'
+import type { FrameNode, SplitNode } from '../src/types'
 
 const pair = (): SplitNode =>
   makeSplit('h', makeFrame('https://a.example/'), makeFrame('https://b.example/'))
+
+describe('addPanelAt', () => {
+  it('adds to the right: horizontal split, existing stays on side a', () => {
+    const root = addPanelAt(makeFrame('https://x/'), [], 'right') as SplitNode
+    expect(root.type).toBe('split')
+    expect(root.dir).toBe('h')
+    expect((root.a as FrameNode).url).toBe('https://x/')
+    expect((root.b as FrameNode).url).toBe('')
+  })
+
+  it('adds to the left: horizontal split, new frame on side a', () => {
+    const root = addPanelAt(makeFrame('https://x/'), [], 'left') as SplitNode
+    expect(root.dir).toBe('h')
+    expect((root.a as FrameNode).url).toBe('')
+    expect((root.b as FrameNode).url).toBe('https://x/')
+  })
+
+  it('adds below: vertical split, new frame on side b', () => {
+    const root = addPanelAt(makeFrame('https://x/'), [], 'bottom') as SplitNode
+    expect(root.dir).toBe('v')
+    expect((root.b as FrameNode).url).toBe('')
+  })
+
+  it('adds above: vertical split, new frame on side a', () => {
+    const root = addPanelAt(makeFrame('https://x/'), [], 'top') as SplitNode
+    expect(root.dir).toBe('v')
+    expect((root.a as FrameNode).url).toBe('')
+    expect((root.b as FrameNode).url).toBe('https://x/')
+  })
+
+  it('adds next to a nested panel by path', () => {
+    const root = addPanelAt(pair(), ['b'], 'right') as SplitNode
+    const b = root.b as SplitNode
+    expect(b.type).toBe('split')
+    expect(b.dir).toBe('h')
+    expect((b.a as FrameNode).url).toBe('https://b.example/')
+    expect((b.b as FrameNode).url).toBe('')
+  })
+})
 
 describe('splitAt', () => {
   it('splits a frame, keeping its URL on both sides', () => {

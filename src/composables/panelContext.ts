@@ -1,4 +1,5 @@
 import type { InjectionKey } from 'vue'
+import type { AddPosition } from '../lib/tree'
 
 /**
  * Lets a deeply-nested FrameView surface a "switch to the URL the presenter
@@ -17,6 +18,10 @@ export interface PanelContext {
   dismiss: (pathKey: string) => void
   /** Presenter: replace this panel's URL, broadcasting to spectators. */
   setUrl: (pathKey: string, url: string) => void
+  /** Presenter: add an empty panel next to this one. */
+  addPanel: (pathKey: string, position: AddPosition) => void
+  /** Presenter: remove this panel (its sibling takes its place). */
+  removePanel: (pathKey: string) => void
 }
 
 export const panelContextKey: InjectionKey<PanelContext> = Symbol('splitr-panel-context')
