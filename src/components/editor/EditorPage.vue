@@ -71,7 +71,11 @@ function open(): void {
 
     <footer>
       <SavedConfigs />
-      <a class="src" href="https://github.com/ManUtopiK/splitr" target="_blank" rel="noreferrer">source</a>
+      <nav class="links">
+        <a href="https://github.com/ManUtopiK/splitr#readme" target="_blank" rel="noreferrer">Docs</a>
+        <a href="https://manutopik.github.io/splitr/" target="_blank" rel="noreferrer">Homepage</a>
+        <a href="https://github.com/ManUtopiK/splitr" target="_blank" rel="noreferrer">Source</a>
+      </nav>
     </footer>
   </div>
 </template>
@@ -134,9 +138,18 @@ footer {
   border-top: 1px solid var(--border);
 }
 
-.src {
+.links {
   margin-left: auto;
+  display: flex;
+  gap: 0.9rem;
+}
+
+.links a {
   color: var(--text-dim);
   font-size: 0.85rem;
+}
+
+.links a:hover {
+  color: var(--accent);
 }
 </style>
