@@ -51,7 +51,7 @@ function submitEmptyUrl(): void {
       :key="reloadTick"
       :src="frame.url"
       :title="frame.url"
-      allow="fullscreen"
+      allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
       referrerpolicy="no-referrer"
     />
     <div v-else class="empty">

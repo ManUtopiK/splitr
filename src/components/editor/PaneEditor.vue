@@ -69,7 +69,7 @@ function togglePreview(): void {
         class="preview"
         :src="previewSrc"
         title="preview"
-        allow="fullscreen"
+        allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
         referrerpolicy="no-referrer"
       />
       <div class="pane-menu" :class="{ open: menuOpen }">
