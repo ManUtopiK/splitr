@@ -60,7 +60,9 @@ The presenter controls, propagated live to every spectator:
 
 - **layout & sizes** — splits and divider drags apply immediately for everyone;
 - **panel URLs** — hover a panel to reveal an inline URL bar and retarget a single iframe. Spectators are **not** reloaded: a *“Le présentateur affiche …”* banner appears over that panel only, and each spectator clicks **Basculer** to switch (or **Ignorer**). Other panels are untouched;
-- **shared pointer** — toggle **Mode pointeur** to broadcast the presenter's cursor over all panels (an overlay captures the pointer above iframes, so clicking through is paused while it's on).
+- **shared pointer** — toggle **Mode pointeur** to broadcast the presenter's cursor over all panels (an overlay captures the pointer above iframes, so clicking through is paused while it's on);
+- **scheduled start** *(optional)* — set a start date/time; until then spectators see a countdown instead of the panels (based on each viewer's own clock);
+- **require a name** *(optional)* — spectators must enter a name before the panels appear, so the presenter sees who's connected.
 
 How it works: state is shared peer-to-peer through a [Yjs](https://yjs.dev) document over [y-webrtc](https://github.com/yjs/y-webrtc) — no server stores anything, no account. The presenter role is whoever holds the key in `localStorage` for that room (the session creator, or anyone who opened a co-presenter link). The role is tied to the browser, so switching device or clearing storage drops it.
 

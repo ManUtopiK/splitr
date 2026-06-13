@@ -23,19 +23,30 @@ export interface RoomSession {
   isPresenter: boolean
   /** Connected participant count (self included). */
   participants: Ref<number>
+  /** Connected participants with their name/role (for the presenter's list). */
+  peers: Ref<{ name: string; role: string }[]>
   /** True once at least one peer connection is established. */
   connected: Ref<boolean>
   /** True once a layout has been received from (or seeded into) the doc. */
   hasSharedLayout: Ref<boolean>
+  /** Optional scheduled start (epoch ms); spectators see a countdown until then. */
+  startAt: Ref<number | null>
+  /** When true, spectators must enter a name before seeing the layout. */
+  requireName: Ref<boolean>
   doc: Y.Doc
   provider: WebrtcProvider
   setLayout: (layout: LayoutNode) => void
   setTitle: (title: string) => void
+  setStartAt: (ts: number | null) => void
+  setRequireName: (value: boolean) => void
+  setName: (name: string) => void
 }
 
 interface SessionState {
   layout?: LayoutNode
   title?: string
+  startAt?: number
+  requireName?: boolean
 }
 
 export function useRoom(
@@ -55,8 +66,11 @@ export function useRoom(
   const layout = shallowRef<LayoutNode>(initialLayout)
   const title = ref(initialTitle)
   const participants = ref(1)
+  const peers = ref<{ name: string; role: string }[]>([])
   const connected = ref(false)
   const hasSharedLayout = ref(false)
+  const startAt = ref<number | null>(null)
+  const requireName = ref(false)
 
   function readFromDoc(): void {
     const sharedLayout = state.get('layout') as LayoutNode | undefined
@@ -66,6 +80,9 @@ export function useRoom(
       hasSharedLayout.value = true
     }
     if (typeof sharedTitle === 'string') title.value = sharedTitle
+    const sharedStart = state.get('startAt')
+    startAt.value = typeof sharedStart === 'number' ? sharedStart : null
+    requireName.value = state.get('requireName') === true
   }
 
   state.observe(readFromDoc)
@@ -88,7 +105,12 @@ export function useRoom(
   }
 
   function updatePresence(): void {
-    participants.value = provider.awareness.getStates().size || 1
+    const states = [...provider.awareness.getStates().values()]
+    participants.value = states.length || 1
+    peers.value = states.map((s) => ({
+      name: typeof s.name === 'string' ? s.name : '',
+      role: typeof s.role === 'string' ? s.role : 'spectator',
+    }))
   }
   provider.awareness.setLocalStateField('role', isPresenter ? 'presenter' : 'spectator')
   provider.awareness.on('change', updatePresence)
@@ -110,6 +132,25 @@ export function useRoom(
     doc.transact(() => state.set('title', next))
   }
 
+  function setStartAt(ts: number | null): void {
+    if (!isPresenter) return
+    startAt.value = ts
+    doc.transact(() => {
+      if (ts === null) state.delete('startAt')
+      else state.set('startAt', ts)
+    })
+  }
+
+  function setRequireName(value: boolean): void {
+    if (!isPresenter) return
+    requireName.value = value
+    doc.transact(() => state.set('requireName', value))
+  }
+
+  function setName(name: string): void {
+    provider.awareness.setLocalStateField('name', name)
+  }
+
   onBeforeUnmount(() => {
     provider.destroy()
     doc.destroy()
@@ -120,11 +161,17 @@ export function useRoom(
     title,
     isPresenter,
     participants,
+    peers,
     connected,
     hasSharedLayout,
+    startAt,
+    requireName,
     doc,
     provider,
     setLayout,
     setTitle,
+    setStartAt,
+    setRequireName,
+    setName,
   }
 }

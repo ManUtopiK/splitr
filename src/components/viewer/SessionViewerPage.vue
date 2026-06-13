@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, provide, ref, shallowRef, watch, watchEffect } from 'vue'
+import { computed, onUnmounted, provide, ref, shallowRef, watch, watchEffect } from 'vue'
 import { addPanelAt, applyRatios, listFrames, removeAt, setRatioAt, updateFrameAt } from '../../lib/tree'
 import { normalizeUrl } from '../../lib/urlCodec'
 import { pruneEmptyFrames, reconcileLayout } from '../../lib/reconcile'
@@ -11,7 +11,11 @@ import type { LayoutNode, NodePath } from '../../types'
 import FrameView from './FrameView.vue'
 import SplitPane from './SplitPane.vue'
 import SessionMenu from './SessionMenu.vue'
+import SessionCountdown from './SessionCountdown.vue'
+import NameGate from './NameGate.vue'
 import RemoteCursor from './RemoteCursor.vue'
+
+const NAME_KEY = 'splitr:name'
 
 const props = defineProps<{
   session: SessionInfo
@@ -25,6 +29,46 @@ const placeholder: LayoutNode = { type: 'frame', url: '' }
 const room = useRoom(props.session, props.initialLayout ?? placeholder, props.initialTitle)
 
 const ready = computed(() => room.isPresenter || room.hasSharedLayout.value)
+
+// Spectator gating: name first, then the scheduled countdown, then the layout.
+function loadName(): string {
+  try {
+    return localStorage.getItem(NAME_KEY) ?? ''
+  } catch {
+    return ''
+  }
+}
+const name = ref(loadName())
+if (name.value) room.setName(name.value)
+
+const needsName = computed(
+  () => !room.isPresenter && room.requireName.value && !name.value.trim(),
+)
+
+const now = ref(Date.now())
+const nowTimer = setInterval(() => (now.value = Date.now()), 1000)
+onUnmounted(() => clearInterval(nowTimer))
+const countingDown = computed(
+  () => !room.isPresenter && room.startAt.value !== null && now.value < room.startAt.value,
+)
+
+function submitName(value: string): void {
+  name.value = value
+  try {
+    localStorage.setItem(NAME_KEY, value)
+  } catch {
+    // ignore
+  }
+  room.setName(value)
+}
+
+function scheduleStart(ts: number | null): void {
+  room.setStartAt(ts)
+}
+
+function toggleRequireName(): void {
+  room.setRequireName(!room.requireName.value)
+}
 
 // Shared presenter cursor. "Pointer mode" lets the presenter point over iframes
 // (an overlay captures the moves) at the cost of clicking through to them.
@@ -177,7 +221,13 @@ function togglePointer(): void {
 
 <template>
   <div ref="viewerEl" class="viewer">
-    <template v-if="ready">
+    <NameGate v-if="needsName" :initial="name" @submit="submitName" />
+    <SessionCountdown
+      v-else-if="countingDown && room.startAt.value !== null"
+      :start-at="room.startAt.value"
+      :title="room.title.value"
+    />
+    <template v-else-if="ready">
       <SplitPane
         v-if="displayed.type === 'split'"
         :node="displayed"
@@ -204,13 +254,18 @@ function togglePointer(): void {
     <SessionMenu
       :is-presenter="room.isPresenter"
       :participants="room.participants.value"
+      :peers="room.peers.value"
       :connected="room.connected.value"
       :pointer-mode="pointerMode"
+      :start-at="room.startAt.value"
+      :require-name="room.requireName.value"
       @copy-link="copySpectatorLink"
       @copy-co-presenter="copyCoPresenterLink"
       @copy-urls="copyUrls"
       @fullscreen="toggleFullscreen"
       @toggle-pointer="togglePointer"
+      @set-start="scheduleStart"
+      @toggle-require-name="toggleRequireName"
       @leave="leave"
     />
   </div>

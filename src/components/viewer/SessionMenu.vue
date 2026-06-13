@@ -1,12 +1,15 @@
 <script setup lang="ts">
-import { shallowRef } from 'vue'
+import { computed, shallowRef } from 'vue'
 import SplitLogo from '../SplitLogo.vue'
 
-defineProps<{
+const props = defineProps<{
   isPresenter: boolean
   participants: number
+  peers: { name: string; role: string }[]
   connected: boolean
   pointerMode: boolean
+  startAt: number | null
+  requireName: boolean
 }>()
 
 const emit = defineEmits<{
@@ -15,8 +18,26 @@ const emit = defineEmits<{
   copyUrls: []
   fullscreen: []
   togglePointer: []
+  setStart: [ts: number | null]
+  toggleRequireName: []
   leave: []
 }>()
+
+// Named participants (presenter's list).
+const namedPeers = computed(() => props.peers.filter((p) => p.name))
+
+// Scheduled start as a <input type="datetime-local"> value (local time).
+const startInput = computed(() => {
+  if (props.startAt === null) return ''
+  const d = new Date(props.startAt)
+  const pad = (n: number): string => String(n).padStart(2, '0')
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`
+})
+
+function onStartInput(event: Event): void {
+  const value = (event.target as HTMLInputElement).value
+  emit('setStart', value ? new Date(value).getTime() : null)
+}
 
 const open = shallowRef(false)
 const copied = shallowRef(false)
@@ -73,6 +94,21 @@ function copyUrls(): void {
         <span>{{ participants }} {{ participants > 1 ? 'participants' : 'participant' }}</span>
         <span class="hint">{{ connected ? 'connecté' : 'en attente de pairs…' }}</span>
       </p>
+
+      <ul v-if="namedPeers.length" class="peers">
+        <li v-for="(p, i) in namedPeers" :key="i">
+          <span class="pr-dot" :class="{ presenter: p.role === 'presenter' }" />{{ p.name }}
+        </li>
+      </ul>
+
+      <label v-if="isPresenter" class="ctl">
+        <span>Démarrage programmé</span>
+        <input type="datetime-local" :value="startInput" @change="onStartInput" />
+      </label>
+      <button v-if="isPresenter" @click="emit('toggleRequireName')">
+        {{ requireName ? '✓ Nom requis pour voir' : 'Exiger un nom pour voir' }}
+      </button>
+
       <button v-if="isPresenter" @click="copy">{{ copied ? '✓ Lien copié' : 'Copier le lien spectateur' }}</button>
       <button v-if="isPresenter" @click="copyCoPresenter">
         {{ copiedCo ? '✓ Lien copié' : 'Copier le lien co-présentateur' }}
@@ -180,5 +216,52 @@ nav button {
 
 nav button:hover {
   background: var(--accent-soft);
+}
+
+.peers {
+  margin: 0;
+  padding: 0.45rem 0.9rem;
+  list-style: none;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  max-height: 9rem;
+  overflow-y: auto;
+}
+
+.peers li {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+
+.pr-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-muted, #888);
+  flex-shrink: 0;
+}
+
+.pr-dot.presenter {
+  background: var(--accent);
+}
+
+.ctl {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 0.55rem 0.9rem;
+  font-size: 0.85em;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+.ctl input {
+  font-size: 0.85em;
+  padding: 0.3rem 0.4rem;
 }
 </style>
