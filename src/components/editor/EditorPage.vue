@@ -54,14 +54,11 @@ function enterPresenterMode(signal: string): void {
 <template>
   <div class="editor">
     <header>
-      <div class="brand">
-        <SplitLogo class="logo" />
-        <h1>Splitr</h1>
-      </div>
-      <div class="center">
-        <LayoutPresets />
-      </div>
-      <div class="right">
+      <div class="left">
+        <div class="brand">
+          <SplitLogo class="logo" />
+          <h1>Splitr</h1>
+        </div>
         <input
           v-model="tree.title.value"
           class="title-input"
@@ -69,6 +66,11 @@ function enterPresenterMode(signal: string): void {
           placeholder="Page title (optional)"
           autocomplete="off"
         />
+      </div>
+      <div class="center">
+        <LayoutPresets />
+      </div>
+      <div class="right">
         <button :disabled="!ready" @click="copyUrl">
           {{ copied ? '✓ Copied' : 'Copy URL' }}
         </button>
@@ -110,6 +112,13 @@ header {
   gap: 0.75rem;
   padding: 0.75rem 1rem;
   border-bottom: 1px solid var(--border);
+}
+
+.left {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  min-width: 0;
 }
 
 .brand {
