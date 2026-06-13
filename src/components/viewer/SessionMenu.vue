@@ -76,6 +76,7 @@ function copy(): void {
 .open .trigger {
   opacity: 1;
   border-color: var(--border);
+  background: rgba(15, 17, 21, 1);
 }
 
 .dot {
