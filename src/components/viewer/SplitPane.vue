@@ -17,11 +17,18 @@ const props = defineProps<{
 
 const container = useTemplateRef('container')
 
+// Equal split: double-clicking a divider snaps it back to 50/50.
+const DEFAULT_RATIO = 50
+
 const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
   container,
   dir: () => props.node.dir,
   onRatio: (ratio) => props.onResize(props.path, ratio),
 })
+
+function resetRatio(): void {
+  if (!props.readonly) props.onResize(props.path, DEFAULT_RATIO)
+}
 </script>
 
 <template>
@@ -41,10 +48,12 @@ const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
       :class="{ inert: readonly }"
       role="separator"
       :aria-orientation="node.dir === 'h' ? 'vertical' : 'horizontal'"
+      :title="readonly ? undefined : 'Double-clic : 50/50'"
       @pointerdown="!readonly && onPointerDown($event)"
       @pointermove="!readonly && onPointerMove($event)"
       @pointerup="!readonly && onPointerUp($event)"
       @pointercancel="!readonly && onPointerUp($event)"
+      @dblclick="resetRatio"
     />
     <div class="pane">
       <SplitPane
