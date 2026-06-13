@@ -1,15 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useEditorTree } from '../../composables/useEditorTree'
+import { normalizeUrl } from '../../lib/urlCodec'
 import type { LayoutNode, NodePath } from '../../types'
 
 // Editor controls for one frame: split, URL + preview toggle, size/refresh,
 // remove. Rendered inline while configuring, or inside the per-pane dropdown
-// once the iframe preview fills the pane.
+// once the iframe preview fills the pane. `previewUrl` is the URL currently
+// shown in the iframe (null when not previewing).
 const props = defineProps<{
   node: LayoutNode
   path: NodePath
-  previewing: boolean
+  previewUrl: string | null
 }>()
 const emit = defineEmits<{ togglePreview: [] }>()
 
@@ -31,20 +33,31 @@ function onShareInput(event: Event): void {
   const pct = Number((event.target as HTMLInputElement).value)
   if (Number.isFinite(pct) && pct > 0 && pct < 100) tree.setShare(props.path, pct)
 }
+
+// True only when the iframe already shows exactly this URL: then the button
+// closes the preview. Otherwise (not previewing, or URL edited) it (re)applies.
+const showsCurrent = computed(
+  () => props.previewUrl !== null && normalizeUrl(url.value) === props.previewUrl,
+)
+
+// Enter (re)applies the preview; it never closes it.
+function onEnter(): void {
+  if (url.value.trim() && !showsCurrent.value) emit('togglePreview')
+}
 </script>
 
 <template>
-  <div class="controls">
+  <div class="controls" :class="{ wide: previewUrl !== null }">
     <div class="actions">
-      <button title="Split into two columns" @click="tree.splitPane(path, 'h')">↔ split horizontal</button>
-      <button title="Split into two rows" @click="tree.splitPane(path, 'v')">↕ split vertical</button>
+      <button title="Split into two columns" @click="tree.splitPane(path, 'h')">↔ Split horizontal</button>
+      <button title="Split into two rows" @click="tree.splitPane(path, 'v')">↕ Split vertical</button>
       <button
         v-if="path.length > 0"
         class="danger"
         title="Remove this panel"
         @click="tree.removePane(path)"
       >
-        ✕ remove
+        ✕ Remove
       </button>
     </div>
 
@@ -56,9 +69,10 @@ function onShareInput(event: Event): void {
         placeholder="https://example.com"
         autocomplete="off"
         spellcheck="false"
+        @keyup.enter="onEnter"
       />
       <button class="show" :disabled="!url.trim()" @click="emit('togglePreview')">
-        {{ previewing ? '✕ close' : '▶ Go!' }}
+        {{ showsCurrent ? '✕ Close' : '▶ Go!' }}
       </button>
     </div>
 
@@ -86,6 +100,11 @@ function onShareInput(event: Event): void {
   width: 100%;
 }
 
+/* In the preview dropdown, controls span the full panel width (not centered). */
+.controls.wide {
+  align-items: stretch;
+}
+
 .actions {
   display: flex;
   flex-wrap: wrap;
@@ -93,10 +112,26 @@ function onShareInput(event: Event): void {
   gap: 0.5rem;
 }
 
+.controls.wide .actions {
+  flex-wrap: nowrap;
+}
+
+/* Grow from each button's content width so together they fill the row,
+   without making the longest label wrap. */
+.controls.wide .actions button {
+  flex: 1 1 auto;
+  justify-content: center;
+  white-space: nowrap;
+}
+
 .url-row {
   display: flex;
   gap: 0.4rem;
   width: min(26rem, 100%);
+}
+
+.controls.wide .url-row {
+  width: 100%;
 }
 
 .url {

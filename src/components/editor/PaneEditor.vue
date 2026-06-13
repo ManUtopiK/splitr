@@ -33,7 +33,9 @@ const isEmpty = computed(() => props.node.type === 'frame' && !props.node.url.tr
 const previewSrc = shallowRef<string | null>(null)
 const menuOpen = shallowRef(false)
 function togglePreview(): void {
-  previewSrc.value = previewSrc.value ? null : normalizeUrl(url.value)
+  const next = normalizeUrl(url.value)
+  // Same URL already shown → close; otherwise show or re-apply the new URL.
+  previewSrc.value = previewSrc.value && previewSrc.value === next ? null : next
   menuOpen.value = false
 }
 </script>
@@ -75,7 +77,7 @@ function togglePreview(): void {
           <SplitLogo :size="15" />
         </button>
         <div v-if="menuOpen" class="menu-panel">
-          <PaneControls :node="node" :path="path" :previewing="true" @toggle-preview="togglePreview" />
+          <PaneControls :node="node" :path="path" :preview-url="previewSrc" @toggle-preview="togglePreview" />
         </div>
       </div>
     </template>
@@ -83,7 +85,7 @@ function togglePreview(): void {
     <!-- Edit mode: discovery intro (empty panes) + the configuration controls. -->
     <template v-else>
       <PaneHero v-if="isEmpty" />
-      <PaneControls :node="node" :path="path" :previewing="false" @toggle-preview="togglePreview" />
+      <PaneControls :node="node" :path="path" :preview-url="null" @toggle-preview="togglePreview" />
     </template>
   </div>
 </template>
@@ -189,7 +191,7 @@ body.splitr-dragging .gutter {
 }
 
 .menu-panel {
-  width: 280px;
+  width: 480px;
   max-width: 80vw;
   padding: 0.7rem;
   background: var(--bg-raised);
