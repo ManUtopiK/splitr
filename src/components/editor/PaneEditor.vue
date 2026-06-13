@@ -27,6 +27,8 @@ const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
 
 const url = computed(() => (props.node.type === 'frame' ? props.node.url : ''))
 const isEmpty = computed(() => props.node.type === 'frame' && !props.node.url.trim())
+// The very first (top-left) leaf has an all-'a' path; only it shows the hero.
+const isFirstPane = computed(() => props.path.every((branch) => branch === 'a'))
 
 // Inline preview: snapshot the current URL into an iframe that fills the pane.
 // While previewing, the editor controls collapse into a top-right dropdown.
@@ -84,7 +86,7 @@ function togglePreview(): void {
 
     <!-- Edit mode: discovery intro (empty panes) + the configuration controls. -->
     <template v-else>
-      <PaneHero v-if="isEmpty" />
+      <PaneHero v-if="isEmpty && isFirstPane" />
       <PaneControls :node="node" :path="path" :preview-url="null" @toggle-preview="togglePreview" />
     </template>
   </div>
