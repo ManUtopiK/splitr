@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, shallowRef, watch, watchEffect } from 'vue'
-import { addPanelAt, listFrames, removeAt, setRatioAt, updateFrameAt } from '../../lib/tree'
+import { addPanelAt, applyRatios, listFrames, removeAt, setRatioAt, updateFrameAt } from '../../lib/tree'
 import { normalizeUrl } from '../../lib/urlCodec'
 import { pruneEmptyFrames, reconcileLayout } from '../../lib/reconcile'
 import { spectatorLink, type SessionInfo } from '../../lib/session'
@@ -45,6 +45,10 @@ function onPointerMove(event: PointerEvent): void {
 const displayed = shallowRef<LayoutNode>(room.layout.value)
 const pending = ref<Record<string, string>>({})
 const dismissed: Record<string, string> = {}
+// Spectator-only: locally adjusted divider sizes, applied on top of the shared
+// layout. Lets a viewer resize for their own screen; the presenter no longer
+// forces a divider the viewer has personally tuned.
+const ratioOverrides = ref<Record<string, number>>({})
 
 function pathFromKey(key: string): NodePath {
   return key ? (key.split('.') as NodePath) : []
@@ -59,7 +63,7 @@ watch(
     }
     // Hide panels the presenter just added but hasn't given a URL yet.
     const { tree, pending: list } = reconcileLayout(displayed.value, pruneEmptyFrames(desired))
-    displayed.value = tree
+    displayed.value = applyRatios(tree, ratioOverrides.value)
     const next: Record<string, string> = {}
     for (const item of list) {
       if (dismissed[item.path] !== item.url) next[item.path] = item.url
@@ -120,15 +124,28 @@ watchEffect(() => {
     'splitr session'
 })
 
-// Only the presenter resizes; the change propagates to spectators via the doc.
+// The presenter resizes for everyone (via the doc); a spectator resizes only
+// their own view (a local override that survives later presenter updates).
 function onResize(path: NodePath, ratio: number): void {
-  if (!room.isPresenter) return
-  room.setLayout(setRatioAt(room.layout.value, path, ratio))
+  if (room.isPresenter) {
+    room.setLayout(setRatioAt(room.layout.value, path, ratio))
+    return
+  }
+  ratioOverrides.value = { ...ratioOverrides.value, [path.join('.')]: ratio }
+  displayed.value = setRatioAt(displayed.value, path, ratio)
 }
 
 function copySpectatorLink(): void {
   const link = spectatorLink(window.location.origin, window.location.pathname, props.session.slug)
   void navigator.clipboard.writeText(link)
+}
+
+function copyUrls(): void {
+  const urls = listFrames(displayed.value)
+    .map(({ frame }) => frame.url)
+    .filter(Boolean)
+    .join('\n')
+  void navigator.clipboard.writeText(urls)
 }
 
 function leave(): void {
@@ -154,7 +171,6 @@ function togglePointer(): void {
         :node="displayed"
         :path="[]"
         :on-resize="onResize"
-        :readonly="!room.isPresenter"
       />
       <FrameView v-else :frame="displayed" :path="[]" />
     </template>
@@ -179,6 +195,7 @@ function togglePointer(): void {
       :connected="room.connected.value"
       :pointer-mode="pointerMode"
       @copy-link="copySpectatorLink"
+      @copy-urls="copyUrls"
       @fullscreen="toggleFullscreen"
       @toggle-pointer="togglePointer"
       @leave="leave"

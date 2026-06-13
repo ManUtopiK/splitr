@@ -11,6 +11,7 @@ defineProps<{
 
 const emit = defineEmits<{
   copyLink: []
+  copyUrls: []
   fullscreen: []
   togglePointer: []
   leave: []
@@ -18,12 +19,21 @@ const emit = defineEmits<{
 
 const open = shallowRef(false)
 const copied = shallowRef(false)
+const copiedUrls = shallowRef(false)
 
 function copy(): void {
   emit('copyLink')
   copied.value = true
   setTimeout(() => {
     copied.value = false
+  }, 1200)
+}
+
+function copyUrls(): void {
+  emit('copyUrls')
+  copiedUrls.value = true
+  setTimeout(() => {
+    copiedUrls.value = false
   }, 1200)
 }
 </script>
@@ -44,6 +54,7 @@ function copy(): void {
       <button v-if="isPresenter" @click="emit('togglePointer')">
         {{ pointerMode ? '✓ Mode pointeur' : 'Mode pointeur' }}
       </button>
+      <button @click="copyUrls">{{ copiedUrls ? '✓ URLs copiées' : 'Copier les URLs des iframes' }}</button>
       <button @click="emit('fullscreen')">Plein écran</button>
       <button @click="emit('leave')">Quitter la session</button>
     </nav>

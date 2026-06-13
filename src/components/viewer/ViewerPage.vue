@@ -52,6 +52,14 @@ async function copyUrl(): Promise<void> {
   await navigator.clipboard.writeText(`${base}?${layoutToQuery(display.value, props.title)}`)
 }
 
+function copyUrls(): void {
+  const urls = listFrames(display.value)
+    .map(({ frame }) => frame.url)
+    .filter(Boolean)
+    .join('\n')
+  void navigator.clipboard.writeText(urls)
+}
+
 function toggleFullscreen(): void {
   if (document.fullscreenElement) void document.exitFullscreen()
   else void document.documentElement.requestFullscreen()
@@ -82,6 +90,7 @@ function startSession(): void {
       :sync-tabs="syncTabs"
       @edit="edit"
       @copy="copyUrl"
+      @copy-urls="copyUrls"
       @fullscreen="toggleFullscreen"
       @reset="resetSizes"
       @toggle-sync="setSyncTabs"

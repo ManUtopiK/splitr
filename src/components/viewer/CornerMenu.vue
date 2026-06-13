@@ -7,6 +7,7 @@ defineProps<{ syncTabs: boolean }>()
 const emit = defineEmits<{
   edit: []
   copy: []
+  copyUrls: []
   fullscreen: []
   reset: []
   toggleSync: [enabled: boolean]
@@ -15,12 +16,22 @@ const emit = defineEmits<{
 
 const open = shallowRef(false)
 const copied = shallowRef(false)
+const copiedUrls = shallowRef(false)
 
 function copy(): void {
   emit('copy')
   copied.value = true
   setTimeout(() => {
     copied.value = false
+    open.value = false
+  }, 900)
+}
+
+function copyUrls(): void {
+  emit('copyUrls')
+  copiedUrls.value = true
+  setTimeout(() => {
+    copiedUrls.value = false
     open.value = false
   }, 900)
 }
@@ -54,6 +65,7 @@ function onStartSession(): void {
     <nav v-if="open">
       <button @click="onEdit">Edit layout</button>
       <button @click="copy">{{ copied ? '✓ Copied' : 'Copy URL' }}</button>
+      <button @click="copyUrls">{{ copiedUrls ? '✓ Copied' : 'Copy iframe URLs' }}</button>
       <button @click="onStartSession">Start session</button>
       <button @click="onFullscreen">Fullscreen</button>
       <button @click="onReset">Reset sizes</button>
