@@ -43,13 +43,25 @@ const showHelp = ref(props.defaultHelp ?? false)
         </div>
 
         <div class="slide">
-          <ol class="guide">
-            <li><b>Add pages</b> — type a URL in each panel.</li>
-            <li><b>Arrange</b> — split a panel into columns (↔) or rows (↕); nest as deep as you like.</li>
-            <li><b>Tune</b> — drag the bar between panels to resize, or set a refresh interval to auto-reload.</li>
-            <li><b>Preview</b> — hit <em>Go!</em> to load a panel inline.</li>
-            <li><b>Share</b> — <em>Copy URL</em> for the exact layout, or <em>Open</em> to view it.</li>
-          </ol>
+          <div class="section">
+            <h3 class="guide-title">Build</h3>
+            <ol class="guide">
+              <li><b>Add pages</b> — type a URL in each panel.</li>
+              <li><b>Arrange</b> — split a panel into columns (↔) or rows (↕); nest as deep as you like.</li>
+              <li><b>Tune</b> — drag the bar between panels to resize, or set a refresh interval.</li>
+              <li><b>Preview</b> — hit <em>Go!</em> to load a panel inline.</li>
+            </ol>
+          </div>
+
+          <div class="section">
+            <h3 class="guide-title">Share</h3>
+            <ul class="share">
+              <li><b>Copy URL</b> — the exact layout as a single link.</li>
+              <li><b>Open</b> — view the layout full-screen.</li>
+              <li><b>Presenter mode</b> — drive the layout live for everyone, with a shared cursor.</li>
+            </ul>
+          </div>
+
           <p class="note">Some sites block embedding (X-Frame-Options / CSP) and stay blank.</p>
         </div>
       </div>
@@ -194,6 +206,20 @@ const showHelp = ref(props.defaultHelp ?? false)
   font-weight: 600;
 }
 
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.guide-title {
+  margin: 0;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--accent);
+}
+
 .guide {
   margin: 0;
   padding-left: 1.3rem;
@@ -202,6 +228,38 @@ const showHelp = ref(props.defaultHelp ?? false)
   gap: 0.5rem;
   color: var(--text-dim);
   line-height: 1.45;
+}
+
+.share {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  color: var(--text-dim);
+  line-height: 1.45;
+}
+
+.share li {
+  position: relative;
+  padding-left: 1.1rem;
+}
+
+.share li::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 2px;
+  background: var(--accent);
+}
+
+.share b {
+  color: var(--text);
+  font-weight: 600;
 }
 
 .guide li::marker {

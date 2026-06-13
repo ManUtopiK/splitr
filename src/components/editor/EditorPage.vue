@@ -3,10 +3,12 @@ import { computed, shallowRef } from 'vue'
 import { provideEditorTree } from '../../composables/useEditorTree'
 import { normalizeLayout } from '../../lib/tree'
 import { layoutToQuery } from '../../lib/urlCodec'
+import { makeKey, makeSlug } from '../../lib/session'
 import type { LayoutNode } from '../../types'
 import SplitLogo from '../SplitLogo.vue'
 import LayoutPresets from './LayoutPresets.vue'
 import PaneEditor from './PaneEditor.vue'
+import PresenterMenu from './PresenterMenu.vue'
 import SavedConfigs from './SavedConfigs.vue'
 
 const props = defineProps<{ initialLayout: LayoutNode | null; initialTitle?: string }>()
@@ -36,6 +38,17 @@ async function copyUrl(): Promise<void> {
 function open(): void {
   if (shareUrl.value) window.location.href = shareUrl.value
 }
+
+// Launch a live presenter session: become presenter (key in the fragment) on
+// the current layout. The spectator link is the same URL without the fragment.
+function enterPresenterMode(signal: string): void {
+  if (!normalizedLayout.value) return
+  const query = layoutToQuery(normalizedLayout.value, tree.title.value)
+  const signalParam = signal ? `&signal=${encodeURIComponent(signal)}` : ''
+  const slug = makeSlug()
+  const key = makeKey()
+  window.location.href = `${window.location.pathname}?${query}${signalParam}&room=${slug}#key=${key}`
+}
 </script>
 
 <template>
@@ -60,6 +73,7 @@ function open(): void {
           {{ copied ? '✓ Copied' : 'Copy URL' }}
         </button>
         <button class="primary" :disabled="!ready" @click="open">Open</button>
+        <PresenterMenu :disabled="!ready" @start="enterPresenterMode" />
       </div>
     </header>
 
