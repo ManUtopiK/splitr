@@ -5,7 +5,6 @@ import { normalizeLayout } from '../../lib/tree'
 import { layoutToQuery } from '../../lib/urlCodec'
 import type { LayoutNode } from '../../types'
 import SplitLogo from '../SplitLogo.vue'
-import HelpPanel from './HelpPanel.vue'
 import LayoutPresets from './LayoutPresets.vue'
 import PaneEditor from './PaneEditor.vue'
 import SavedConfigs from './SavedConfigs.vue'
@@ -14,7 +13,6 @@ const props = defineProps<{ initialLayout: LayoutNode | null; initialTitle?: str
 
 const tree = provideEditorTree(props.initialLayout, props.initialTitle ?? '')
 
-const showHelp = shallowRef(false)
 const copied = shallowRef(false)
 
 /** Layout with every frame URL normalized (https:// prepended, etc.). */
@@ -45,25 +43,25 @@ function open(): void {
     <header>
       <div class="brand">
         <SplitLogo class="logo" />
-        <h1>splitr</h1>
+        <h1>Splitr</h1>
       </div>
-      <LayoutPresets />
-      <button :aria-expanded="showHelp" @click="showHelp = !showHelp">?&nbsp;Help</button>
-      <div class="spacer" />
-      <input
-        v-model="tree.title.value"
-        class="title-input"
-        type="text"
-        placeholder="Page title (optional)"
-        autocomplete="off"
-      />
-      <button :disabled="!ready" @click="copyUrl">
-        {{ copied ? '✓ Copied' : 'Copy URL' }}
-      </button>
-      <button class="primary" :disabled="!ready" @click="open">Open</button>
+      <div class="center">
+        <LayoutPresets />
+      </div>
+      <div class="right">
+        <input
+          v-model="tree.title.value"
+          class="title-input"
+          type="text"
+          placeholder="Page title (optional)"
+          autocomplete="off"
+        />
+        <button :disabled="!ready" @click="copyUrl">
+          {{ copied ? '✓ Copied' : 'Copy URL' }}
+        </button>
+        <button class="primary" :disabled="!ready" @click="open">Open</button>
+      </div>
     </header>
-
-    <HelpPanel v-if="showHelp" />
 
     <main>
       <PaneEditor :node="tree.layout.value" :path="[]" />
@@ -88,7 +86,8 @@ function open(): void {
 }
 
 header {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: 0.75rem;
   padding: 0.75rem 1rem;
@@ -99,7 +98,17 @@ header {
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  margin-right: 0.5rem;
+}
+
+.center {
+  justify-self: center;
+}
+
+.right {
+  justify-self: end;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
 }
 
 .logo {
@@ -109,10 +118,6 @@ header {
 h1 {
   font-size: 1.15rem;
   letter-spacing: 0.04em;
-}
-
-.spacer {
-  flex: 1;
 }
 
 .title-input {

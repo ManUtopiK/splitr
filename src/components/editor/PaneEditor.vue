@@ -6,7 +6,7 @@ import { normalizeUrl } from '../../lib/urlCodec'
 import type { LayoutNode, NodePath } from '../../types'
 import SplitLogo from '../SplitLogo.vue'
 import PaneControls from './PaneControls.vue'
-import PaneHero from './PaneHero.vue'
+import PaneIntro from './PaneIntro.vue'
 
 const props = defineProps<{
   node: LayoutNode
@@ -86,7 +86,7 @@ function togglePreview(): void {
 
     <!-- Edit mode: discovery intro (empty panes) + the configuration controls. -->
     <template v-else>
-      <PaneHero v-if="isEmpty && isFirstPane" />
+      <PaneIntro v-if="isEmpty" :default-help="!isFirstPane" />
       <PaneControls :node="node" :path="path" :preview-url="null" @toggle-preview="togglePreview" />
     </template>
   </div>
