@@ -3,7 +3,7 @@ import { computed, provide, ref, shallowRef, watch, watchEffect } from 'vue'
 import { addPanelAt, applyRatios, listFrames, removeAt, setRatioAt, updateFrameAt } from '../../lib/tree'
 import { normalizeUrl } from '../../lib/urlCodec'
 import { pruneEmptyFrames, reconcileLayout } from '../../lib/reconcile'
-import { spectatorLink, type SessionInfo } from '../../lib/session'
+import { coPresenterLink, spectatorLink, type SessionInfo } from '../../lib/session'
 import { useRoom } from '../../composables/useRoom'
 import { useSharedCursor } from '../../composables/useSharedCursor'
 import { panelContextKey } from '../../composables/panelContext'
@@ -140,6 +140,18 @@ function copySpectatorLink(): void {
   void navigator.clipboard.writeText(link)
 }
 
+// Presenter only: an invite link that grants presenter control to a co-presenter.
+function copyCoPresenterLink(): void {
+  if (!props.session.key) return
+  const link = coPresenterLink(
+    window.location.origin,
+    window.location.pathname,
+    props.session.slug,
+    props.session.key,
+  )
+  void navigator.clipboard.writeText(link)
+}
+
 function copyUrls(): void {
   const urls = listFrames(displayed.value)
     .map(({ frame }) => frame.url)
@@ -195,6 +207,7 @@ function togglePointer(): void {
       :connected="room.connected.value"
       :pointer-mode="pointerMode"
       @copy-link="copySpectatorLink"
+      @copy-co-presenter="copyCoPresenterLink"
       @copy-urls="copyUrls"
       @fullscreen="toggleFullscreen"
       @toggle-pointer="togglePointer"

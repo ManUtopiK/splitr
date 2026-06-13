@@ -36,9 +36,9 @@ const showHelp = ref(props.defaultHelp ?? false)
             <strong>No account, nothing to install.</strong>
           </p>
           <ul class="features">
-            <li><b>Shareable layouts</b> — the whole split is encoded in the URL. One link recreates it anywhere.</li>
-            <li><b>Live sessions</b> — present to a room in real time, with a shared cursor.</li>
-            <li><b>Live dashboards</b> — auto-refresh any panel on its own timer.</li>
+            <li><b>Shareable layouts</b> : the whole split is encoded in the URL. One link recreates it anywhere.</li>
+            <li><b>Live sessions</b> : present to a room in real time, with a shared cursor.</li>
+            <li><b>Live dashboards</b> : auto-refresh any panel on its own timer.</li>
           </ul>
         </div>
 
@@ -46,19 +46,19 @@ const showHelp = ref(props.defaultHelp ?? false)
           <div class="section">
             <h3 class="guide-title">Build</h3>
             <ol class="guide">
-              <li><b>Add pages</b> — type a URL in each panel.</li>
-              <li><b>Arrange</b> — split a panel into columns (↔) or rows (↕); nest as deep as you like.</li>
-              <li><b>Tune</b> — drag the bar between panels to resize, or set a refresh interval.</li>
-              <li><b>Preview</b> — hit <em>Go!</em> to load a panel inline.</li>
+              <li><b>Add pages</b> : type a URL in each panel.</li>
+              <li><b>Arrange</b> : split a panel into columns (↔) or rows (↕)<br> Nest as deep as you like.</li>
+              <li><b>Tune</b> : drag the bar between panels to resize, or set a refresh interval.</li>
+              <li><b>Preview</b> : hit <em>Go!</em> to load a panel inline.</li>
             </ol>
           </div>
 
           <div class="section">
             <h3 class="guide-title">Share</h3>
             <ul class="share">
-              <li><b>Copy URL</b> — the exact layout as a single link.</li>
-              <li><b>Open</b> — view the layout full-screen.</li>
-              <li><b>Presenter mode</b> — drive the layout live for everyone, with a shared cursor.</li>
+              <li><b>Copy URL</b> : the exact layout as a single link.</li>
+              <li><b>Open</b> : view the layout full-screen.</li>
+              <li><b>Presenter mode</b> : drive the layout live for everyone, with a shared cursor.</li>
             </ul>
           </div>
 
@@ -209,19 +209,18 @@ const showHelp = ref(props.defaultHelp ?? false)
 .section {
   display: flex;
   flex-direction: column;
-  gap: 0.45rem;
+  gap: 0.8rem;
 }
 
 .guide-title {
   margin: 0;
-  font-size: 0.8rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: var(--accent);
+  font-size: 1.45rem;
+  line-height: 1.2;
+  color: var(--text);
 }
 
 .guide {
-  margin: 0;
+  margin-bottom: 0.8rem;
   padding-left: 1.3rem;
   display: flex;
   flex-direction: column;

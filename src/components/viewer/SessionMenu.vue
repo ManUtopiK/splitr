@@ -11,6 +11,7 @@ defineProps<{
 
 const emit = defineEmits<{
   copyLink: []
+  copyCoPresenter: []
   copyUrls: []
   fullscreen: []
   togglePointer: []
@@ -19,6 +20,7 @@ const emit = defineEmits<{
 
 const open = shallowRef(false)
 const copied = shallowRef(false)
+const copiedCo = shallowRef(false)
 const copiedUrls = shallowRef(false)
 
 function copy(): void {
@@ -26,6 +28,14 @@ function copy(): void {
   copied.value = true
   setTimeout(() => {
     copied.value = false
+  }, 1200)
+}
+
+function copyCoPresenter(): void {
+  emit('copyCoPresenter')
+  copiedCo.value = true
+  setTimeout(() => {
+    copiedCo.value = false
   }, 1200)
 }
 
@@ -51,6 +61,9 @@ function copyUrls(): void {
         <span class="hint">{{ connected ? 'connecté' : 'en attente de pairs…' }}</span>
       </p>
       <button v-if="isPresenter" @click="copy">{{ copied ? '✓ Lien copié' : 'Copier le lien spectateur' }}</button>
+      <button v-if="isPresenter" @click="copyCoPresenter">
+        {{ copiedCo ? '✓ Lien copié' : 'Copier le lien co-présentateur' }}
+      </button>
       <button v-if="isPresenter" @click="emit('togglePointer')">
         {{ pointerMode ? '✓ Mode pointeur' : 'Mode pointeur' }}
       </button>

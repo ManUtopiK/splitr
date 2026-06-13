@@ -3,7 +3,7 @@ import { computed, shallowRef } from 'vue'
 import { provideEditorTree } from '../../composables/useEditorTree'
 import { normalizeLayout } from '../../lib/tree'
 import { layoutToQuery } from '../../lib/urlCodec'
-import { makeKey, makeSlug } from '../../lib/session'
+import { makeKey, makeSlug, rememberPresenter } from '../../lib/session'
 import type { LayoutNode } from '../../types'
 import SplitLogo from '../SplitLogo.vue'
 import LayoutPresets from './LayoutPresets.vue'
@@ -39,15 +39,15 @@ function open(): void {
   if (shareUrl.value) window.location.href = shareUrl.value
 }
 
-// Launch a live presenter session: become presenter (key in the fragment) on
-// the current layout. The spectator link is the same URL without the fragment.
+// Launch a live presenter session: remember the presenter key locally, then
+// open the room. No key in the URL — the address bar shows only ?room=<slug>.
 function enterPresenterMode(signal: string): void {
   if (!normalizedLayout.value) return
   const query = layoutToQuery(normalizedLayout.value, tree.title.value)
   const signalParam = signal ? `&signal=${encodeURIComponent(signal)}` : ''
   const slug = makeSlug()
-  const key = makeKey()
-  window.location.href = `${window.location.pathname}?${query}${signalParam}&room=${slug}#key=${key}`
+  rememberPresenter(slug, makeKey())
+  window.location.href = `${window.location.pathname}?${query}${signalParam}&room=${slug}`
 }
 </script>
 
