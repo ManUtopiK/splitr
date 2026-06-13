@@ -10,6 +10,7 @@ const emit = defineEmits<{
   fullscreen: []
   reset: []
   toggleSync: [enabled: boolean]
+  startSession: []
 }>()
 
 const open = shallowRef(false)
@@ -38,6 +39,11 @@ function onReset(): void {
   emit('reset')
   open.value = false
 }
+
+function onStartSession(): void {
+  emit('startSession')
+  open.value = false
+}
 </script>
 
 <template>
@@ -48,6 +54,7 @@ function onReset(): void {
     <nav v-if="open">
       <button @click="onEdit">Edit layout</button>
       <button @click="copy">{{ copied ? '✓ Copied' : 'Copy URL' }}</button>
+      <button @click="onStartSession">Start session</button>
       <button @click="onFullscreen">Fullscreen</button>
       <button @click="onReset">Reset sizes</button>
       <label class="sync">
@@ -70,6 +77,7 @@ function onReset(): void {
   z-index: 10;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0.3rem;
 }
 

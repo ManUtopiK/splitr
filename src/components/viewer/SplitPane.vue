@@ -11,6 +11,8 @@ const props = defineProps<{
   node: SplitNode
   path: NodePath
   onResize: (path: NodePath, ratio: number) => void
+  /** Spectators in a session can't resize: dividers are inert. */
+  readonly?: boolean
 }>()
 
 const container = useTemplateRef('container')
@@ -30,17 +32,19 @@ const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
         :node="node.a"
         :path="[...path, 'a']"
         :on-resize="onResize"
+        :readonly="readonly"
       />
-      <FrameView v-else :frame="node.a" />
+      <FrameView v-else :frame="node.a" :path="[...path, 'a']" />
     </div>
     <div
       class="divider"
+      :class="{ inert: readonly }"
       role="separator"
       :aria-orientation="node.dir === 'h' ? 'vertical' : 'horizontal'"
-      @pointerdown="onPointerDown"
-      @pointermove="onPointerMove"
-      @pointerup="onPointerUp"
-      @pointercancel="onPointerUp"
+      @pointerdown="!readonly && onPointerDown($event)"
+      @pointermove="!readonly && onPointerMove($event)"
+      @pointerup="!readonly && onPointerUp($event)"
+      @pointercancel="!readonly && onPointerUp($event)"
     />
     <div class="pane">
       <SplitPane
@@ -48,8 +52,9 @@ const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
         :node="node.b"
         :path="[...path, 'b']"
         :on-resize="onResize"
+        :readonly="readonly"
       />
-      <FrameView v-else :frame="node.b" />
+      <FrameView v-else :frame="node.b" :path="[...path, 'b']" />
     </div>
   </div>
 </template>
@@ -94,12 +99,17 @@ const { onPointerDown, onPointerMove, onPointerUp } = useDividerDrag({
   touch-action: none;
 }
 
-.row > .divider {
+.row > .divider:not(.inert) {
   cursor: col-resize;
 }
 
-.column > .divider {
+.column > .divider:not(.inert) {
   cursor: row-resize;
+}
+
+.divider.inert {
+  cursor: default;
+  pointer-events: none;
 }
 
 .divider:hover,

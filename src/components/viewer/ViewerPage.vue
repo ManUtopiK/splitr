@@ -3,6 +3,7 @@ import { shallowRef, watchEffect } from 'vue'
 import { applyRatios, collectRatios, listFrames, setRatioAt } from '../../lib/tree'
 import { clearSizes, loadSizes, saveSizes } from '../../lib/storage'
 import { layoutToQuery } from '../../lib/urlCodec'
+import { makeKey, makeSlug } from '../../lib/session'
 import { useTabSync } from '../../composables/useTabSync'
 import type { LayoutNode, NodePath } from '../../types'
 import CornerMenu from './CornerMenu.vue'
@@ -61,6 +62,16 @@ function resetSizes(): void {
   display.value = props.layout
   broadcast(null)
 }
+
+// Promote the current layout into a live session: become presenter (key in the
+// fragment) and load the session viewer. The spectator link is the same URL
+// without the fragment.
+function startSession(): void {
+  const query = layoutToQuery(display.value, props.title)
+  const slug = makeSlug()
+  const key = makeKey()
+  window.location.href = `${window.location.pathname}?${query}&room=${slug}#key=${key}`
+}
 </script>
 
 <template>
@@ -74,6 +85,7 @@ function resetSizes(): void {
       @fullscreen="toggleFullscreen"
       @reset="resetSizes"
       @toggle-sync="setSyncTabs"
+      @start-session="startSession"
     />
   </div>
 </template>

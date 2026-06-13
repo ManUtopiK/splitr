@@ -37,6 +37,7 @@ const langs: Lang[] = ['en', 'fr', 'es']
         <li><em>size</em> sets the panel share of its parent split (%); <em>refresh</em> reloads the frame every N seconds.</li>
         <li>Two panels side by side give a readable URL (<code>?a=…&amp;b=…</code>); complex layouts use a compact <code>?l=…</code> parameter.</li>
         <li>In the viewer, drag the dividers to resize (saved locally per URL) and use the top-left corner menu to edit, copy or go fullscreen.</li>
+        <li><em>Start session</em> shares a live link: you drive the layout, panel URLs and a shared pointer for every viewer (peer-to-peer, no account). Spectators choose when to switch a changed panel.</li>
         <li>Some sites refuse to be embedded in iframes (X-Frame-Options / CSP frame-ancestors) and will stay blank.</li>
       </ul>
     </template>
@@ -53,6 +54,7 @@ const langs: Lang[] = ['en', 'fr', 'es']
         <li><em>size</em> fixe la part du panneau dans son parent (%) ; <em>refresh</em> recharge le cadre toutes les N secondes.</li>
         <li>Deux panneaux côte à côte donnent une URL lisible (<code>?a=…&amp;b=…</code>) ; les dispositions complexes utilisent un paramètre compact <code>?l=…</code>.</li>
         <li>Dans le viewer, glissez les séparateurs pour redimensionner (mémorisé localement par URL) et utilisez le menu du coin haut gauche pour éditer, copier ou passer en plein écran.</li>
+        <li><em>Start session</em> partage un lien en direct : vous pilotez la disposition, les URLs des panneaux et un pointeur partagé pour tous les spectateurs (pair-à-pair, sans compte). Chaque spectateur décide quand basculer un panneau modifié.</li>
         <li>Certains sites refusent d'être intégrés en iframe (X-Frame-Options / CSP frame-ancestors) et resteront vides.</li>
       </ul>
     </template>
@@ -69,6 +71,7 @@ const langs: Lang[] = ['en', 'fr', 'es']
         <li><em>size</em> fija la parte del panel en su contenedor (%); <em>refresh</em> recarga el marco cada N segundos.</li>
         <li>Dos paneles lado a lado dan una URL legible (<code>?a=…&amp;b=…</code>); las disposiciones complejas usan un parámetro compacto <code>?l=…</code>.</li>
         <li>En el visor, arrastre los separadores para redimensionar (guardado localmente por URL) y use el menú de la esquina superior izquierda para editar, copiar o pasar a pantalla completa.</li>
+        <li><em>Start session</em> comparte un enlace en directo: usted controla la disposición, las URLs de los paneles y un puntero compartido para todos los espectadores (peer-to-peer, sin cuenta). Cada espectador decide cuándo cambiar un panel modificado.</li>
         <li>Algunos sitios rechazan ser integrados en iframes (X-Frame-Options / CSP frame-ancestors) y quedarán en blanco.</li>
       </ul>
     </template>
