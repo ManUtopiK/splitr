@@ -97,6 +97,7 @@ const showHelp = ref(props.defaultHelp ?? false)
 
 .logo {
   color: var(--accent);
+  margin-bottom: 0.1rem;
 }
 
 /* Vertical slot: "Splitr" / "Help" stacked; toggling slides up/down. */

@@ -70,8 +70,12 @@ function open(): void {
     <footer>
       <SavedConfigs />
       <nav class="links">
-        <a href="https://github.com/ManUtopiK/splitr#readme" target="_blank" rel="noreferrer">Docs</a>
+        <span>
+          Made with ❤️ and 🤖 by <a href="https://github.com/ManUtopiK" target="_blank" rel="noreferrer">ManUtopiK</a> for <a href="https://serveur-ia.fr" target="_blank">serveur-ia.fr</a> and <a href="https://wordup.md" target="_blank">WordUp.md</a>
+        </span>
+        <span>▓ ▒</span>
         <a href="https://manutopik.github.io/splitr/" target="_blank" rel="noreferrer">Homepage</a>
+        <a href="https://github.com/ManUtopiK/splitr#readme" target="_blank" rel="noreferrer">Docs</a>
         <a href="https://github.com/ManUtopiK/splitr" target="_blank" rel="noreferrer">Source</a>
       </nav>
     </footer>
@@ -149,7 +153,7 @@ footer {
   gap: 0.9rem;
 }
 
-.links a {
+.links * {
   color: var(--text-dim);
   font-size: 0.85rem;
 }
