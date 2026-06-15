@@ -59,6 +59,11 @@ function enterPresenterMode(signal: string): void {
           <SplitLogo class="logo" />
           <h1>Splitr</h1>
         </div>
+        <button class="primary" :disabled="!ready" @click="open">Open</button>
+        <button :disabled="!ready" @click="copyUrl">
+          {{ copied ? '✓ Copied' : 'Copy URL' }}
+        </button>
+        <PresenterMenu :disabled="!ready" @start="enterPresenterMode" />
         <input
           v-model="tree.title.value"
           class="title-input"
@@ -69,13 +74,6 @@ function enterPresenterMode(signal: string): void {
       </div>
       <div class="center">
         <LayoutPresets />
-      </div>
-      <div class="right">
-        <button :disabled="!ready" @click="copyUrl">
-          {{ copied ? '✓ Copied' : 'Copy URL' }}
-        </button>
-        <button class="primary" :disabled="!ready" @click="open">Open</button>
-        <PresenterMenu :disabled="!ready" @start="enterPresenterMode" />
       </div>
     </header>
 
@@ -129,13 +127,6 @@ header {
 
 .center {
   justify-self: center;
-}
-
-.right {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
 }
 
 .logo {
