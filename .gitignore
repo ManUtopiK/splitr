@@ -2,3 +2,6 @@ node_modules/
 dist/
 result
 *.local
+
+tasks
+dev-docs.md
