@@ -1,6 +1,6 @@
 {
   "name": "splitr",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Split-screen iframe viewer — share two or more pages side by side with a single URL",
   "license": "MIT",
   "private": true,

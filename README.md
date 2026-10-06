@@ -70,6 +70,15 @@ How it works: state is shared peer-to-peer through a [Yjs](https://yjs.dev) docu
 
 > Note: a site only renders inside an iframe if it allows it. Sites sending restrictive `X-Frame-Options` / CSP `frame-ancestors` headers (Google, GitHub…) will stay blank. Some apps also break when your browser **blocks third-party storage/cookies**: embedded cross-site, their unguarded `localStorage` access throws and the app fails to start (blank). Allow third-party cookies for the page, or the embedded site needs to handle the denial.
 
+## Camera, microphone & screen sharing
+
+splitr delegates camera, microphone, screen sharing and a few other permissions (autoplay, clipboard, geolocation, screen wake lock, web share) to the embedded pages, so a visio or a recording tool works inside a panel. The browser still asks the user before granting them.
+
+Delegation only works if every level allows it:
+
+- **the page serving splitr** must not send a restrictive `Permissions-Policy` header (e.g. `camera=()`), otherwise nothing can be delegated. Send no header at all, or allow the features explicitly: `Permissions-Policy: camera=*, microphone=*, display-capture=*`;
+- **the embedded page** must allow them too in its own `Permissions-Policy` (a site sending `camera=(self)` will refuse the camera inside splitr).
+
 ## Self-hosting
 
 The build is a single `index.html` — grab it from the [latest release](https://github.com/ManUtopiK/splitr/releases/latest) (or `npm run build`) and serve it with any static server.

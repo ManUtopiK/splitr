@@ -2,6 +2,7 @@
 import { computed, shallowRef, useTemplateRef } from 'vue'
 import { useDividerDrag } from '../../composables/useDividerDrag'
 import { useEditorTree } from '../../composables/useEditorTree'
+import { IFRAME_ALLOW } from '../../lib/iframe'
 import { normalizeUrl } from '../../lib/urlCodec'
 import type { LayoutNode, NodePath } from '../../types'
 import SplitLogo from '../SplitLogo.vue'
@@ -71,7 +72,7 @@ function togglePreview(): void {
         class="preview"
         :src="previewSrc"
         title="preview"
-        allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
+        :allow="IFRAME_ALLOW"
         referrerpolicy="no-referrer"
       />
       <div class="pane-menu" :class="{ open: menuOpen }">

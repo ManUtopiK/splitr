@@ -2,6 +2,7 @@
 import { computed, inject, onUnmounted, ref, shallowRef, watchEffect } from 'vue'
 import type { FrameNode, NodePath } from '../../types'
 import { panelContextKey } from '../../composables/panelContext'
+import { IFRAME_ALLOW } from '../../lib/iframe'
 import PanelControls from './PanelControls.vue'
 
 const props = withDefaults(defineProps<{ frame: FrameNode; path?: NodePath }>(), {
@@ -51,7 +52,7 @@ function submitEmptyUrl(): void {
       :key="reloadTick"
       :src="frame.url"
       :title="frame.url"
-      allow="camera; microphone; fullscreen; display-capture; autoplay; clipboard-write"
+      :allow="IFRAME_ALLOW"
       referrerpolicy="no-referrer"
     />
     <div v-else class="empty">
